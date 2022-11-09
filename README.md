@@ -10,3 +10,8 @@ Daemonsets for filebeat running on each node to tail app logs stored in /tmp/log
 Achieved log persistance by using Persistent volumes, Persistent volume claims and Storage class.
 
 Used Config maps and Secrets to pass configuration to Pods by volume mounts.
+
+To run,
+
+`chmod +x ./deploy.sh`
+`./deploy.sh apply`
