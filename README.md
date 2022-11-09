@@ -15,3 +15,7 @@ To run,
 
 `chmod +x ./deploy.sh`
 `./deploy.sh apply`
+
+To delete
+
+`./deploy.sh delete`
