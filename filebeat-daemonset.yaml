@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  labels:
+    app: filebeat
+spec:
+  selector:
+    matchLabels:
+      name: fb
+  template:
+    metadata:
+      labels:
+        name: fb
+    spec:
+      nodeSelector:
+        node: app
+      securityContext:
+        runAsUser: 0
+      tolerations:
+        # these tolerations are to have the daemonset runnable on control plane nodes
+        # remove them if your control plane nodes should not run pods
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: filebeat
+          image: elastic/filebeat:8.4.2
+          args: [
+            "-c", "/usr/share/filebeat/filebeat.yml",
+            "-e",
+          ]
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          volumeMounts:
+            - name: create-folder-script
+              mountPath: /usr/share/create-log-folder.sh
+              subPath: create-log-folder.sh
+            - name: config
+              mountPath: /usr/share/filebeat/filebeat.yml
+              readOnly: true
+              subPath: filebeat.yml
+            - name: log
+              mountPath: /tmp/logs
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: log
+          persistentVolumeClaim:
+            claimName: test-pvc
+        - name: config
+          configMap:
+            defaultMode: 0600
+            name: filebeat-config-file
+        - name: create-folder-script
+          configMap:
+            name: create-log-folder
+            defaultMode: 0777

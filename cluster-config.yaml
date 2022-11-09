@@ -1,0 +1,24 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: test-cluster
+  region: us-west-2
+
+nodeGroups:
+  - name: node-1
+    labels: { node: es }
+    instanceType: t2.medium
+    desiredCapacity: 1
+    ssh:
+      enableSsm: true
+      allow: true
+      publicKeyName: my-key-pair-us-west-2
+  - name: node-2
+    labels: { node: app }
+    instanceType: t2.micro
+    desiredCapacity: 3
+    ssh:
+      enableSsm: true
+      allow: true
+      publicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCGQzErBgBM9yruFKZcA4S/bAoLj29JvTh0OF7ZRMWOH3wo/rL0yxpOQnjV1SYxIZRdeSc6H5zDApg7QZAftkDvceSVHv9SRtb+Fw3JuF7hCWaq2x1u71+ofTzc/s3rL5usRotviSGcFoCsXSkkHXnrjTfE11mhpnit3ULFAnrk8Z2MR7DvzIA9JCe+AVvaVmKJA58tiO5k/Ux6/LMkqEmXZocfM9BJ/H8pCuMAerE5sbL7LK7X6t9sHzKLuyFtV3a/vbMoAARM0hDH9zI3GxnJkFdMgVh/SHMB4cohUQ8VMj6gxXcNHxtZlCV8qasKe7nZ/XDgOT9yhw6W25Si361J"

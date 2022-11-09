@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zinc-search
+spec:
+  replicas: 1
+  serviceName: zs
+  selector:
+    matchLabels:
+      app: zinc
+  template:
+    metadata:
+      labels:
+        app: zinc
+    spec:
+      containers:
+        - name: zinc
+          image: public.ecr.aws/zinclabs/zinc:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4080
+              name: http
+          env:
+            - name: ZINC_FIRST_ADMIN_USER
+              value: admin
+            - name: ZINC_FIRST_ADMIN_PASSWORD
+              value: admin
+          resources:
+            limits:
+              cpu: 1024m
+              memory: 2048Mi
+            requests:
+              cpu: 32m
+              memory: 50Mi
+          volumeMounts:
+            - mountPath: /go/bin/data
+              name: zincdata
+  volumeClaimTemplates:
+    - metadata:
+        name: zincdata
+      spec:
+        resources:
+          requests:
+            storage: 1Gi
+        accessModes:
+          - ReadWriteOnce
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zinc-search
+spec:
+  type: NodePort
+  selector:
+    app: zinc
+  ports:
+    - name: http
+      port: 4080
+      targetPort: 4080
